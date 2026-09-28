@@ -1,0 +1,6 @@
+{
+  "name": "JanSamadhan AI - National Civic Grievance & Budget Portal",
+  "description": "AI-powered Indian citizen grievance redressal platform with local voice input, PAN-OTP authentication, real-time demand aggregation analytics, and government project budget tracking.",
+  "requestFramePermissions": ["microphone"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
