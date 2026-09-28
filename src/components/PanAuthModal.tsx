@@ -13,7 +13,7 @@ import {
   Building
 } from 'lucide-react';
 import { CitizenProfile } from '../types';
-import { INDIAN_STATES_DISTRICTS, DEMO_USER_PROFILE } from '../data/mockData';
+import { INDIAN_STATES_DISTRICTS, DEMO_USER_PROFILE, getLocalBodiesForDistrict } from '../data/mockData';
 
 interface PanAuthModalProps {
   isOpen: boolean;
@@ -130,7 +130,7 @@ export const PanAuthModal: React.FC<PanAuthModalProps> = ({ isOpen, onClose, onS
   };
 
   const availableDistricts = INDIAN_STATES_DISTRICTS[selectedState]?.districts || [];
-  const availableLocalBodies = INDIAN_STATES_DISTRICTS[selectedState]?.localBodies[selectedDistrict] || ['Municipal Corporation'];
+  const availableLocalBodies = getLocalBodiesForDistrict(selectedState, selectedDistrict);
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-xs">
@@ -357,7 +357,7 @@ export const PanAuthModal: React.FC<PanAuthModalProps> = ({ isOpen, onClose, onS
                       const dists = INDIAN_STATES_DISTRICTS[st]?.districts || [];
                       if (dists.length > 0) {
                         setSelectedDistrict(dists[0]);
-                        const bodies = INDIAN_STATES_DISTRICTS[st]?.localBodies[dists[0]] || [];
+                        const bodies = getLocalBodiesForDistrict(st, dists[0]);
                         if (bodies.length > 0) setSelectedLocalBody(bodies[0]);
                       }
                     }}
@@ -378,7 +378,7 @@ export const PanAuthModal: React.FC<PanAuthModalProps> = ({ isOpen, onClose, onS
                     onChange={(e) => {
                       const d = e.target.value;
                       setSelectedDistrict(d);
-                      const bodies = INDIAN_STATES_DISTRICTS[selectedState]?.localBodies[d] || [];
+                      const bodies = getLocalBodiesForDistrict(selectedState, d);
                       if (bodies.length > 0) setSelectedLocalBody(bodies[0]);
                     }}
                     className="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 outline-hidden"

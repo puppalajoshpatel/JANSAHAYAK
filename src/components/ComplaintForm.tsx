@@ -28,7 +28,7 @@ import {
   GrievanceItem,
   LocationHierarchy 
 } from '../types';
-import { INDIAN_STATES_DISTRICTS, CATEGORY_DETAILS } from '../data/mockData';
+import { INDIAN_STATES_DISTRICTS, CATEGORY_DETAILS, getLocalBodiesForDistrict } from '../data/mockData';
 import { CivicVoiceRecorder } from './CivicVoiceRecorder';
 import { analyzeCitizenGrievance, AIAnalysisResult } from '../services/aiService';
 
@@ -247,7 +247,7 @@ export const ComplaintForm: React.FC<ComplaintFormProps> = ({
   };
 
   const availableDistricts = INDIAN_STATES_DISTRICTS[state]?.districts || [];
-  const availableLocalBodies = INDIAN_STATES_DISTRICTS[state]?.localBodies[district] || ['Municipal Corporation'];
+  const availableLocalBodies = getLocalBodiesForDistrict(state, district);
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-8 space-y-6">
@@ -444,7 +444,7 @@ export const ComplaintForm: React.FC<ComplaintFormProps> = ({
                     const dists = INDIAN_STATES_DISTRICTS[st]?.districts || [];
                     if (dists.length > 0) {
                       setDistrict(dists[0]);
-                      const bodies = INDIAN_STATES_DISTRICTS[st]?.localBodies[dists[0]] || [];
+                      const bodies = getLocalBodiesForDistrict(st, dists[0]);
                       if (bodies.length > 0) setLocalBody(bodies[0]);
                     }
                   }}
@@ -463,7 +463,7 @@ export const ComplaintForm: React.FC<ComplaintFormProps> = ({
                   onChange={(e) => {
                     const d = e.target.value;
                     setDistrict(d);
-                    const bodies = INDIAN_STATES_DISTRICTS[state]?.localBodies[d] || [];
+                    const bodies = getLocalBodiesForDistrict(state, d);
                     if (bodies.length > 0) setLocalBody(bodies[0]);
                   }}
                   className="w-full text-xs px-2.5 py-2 bg-white border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 outline-hidden font-medium"

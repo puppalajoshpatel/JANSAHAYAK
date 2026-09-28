@@ -27,7 +27,7 @@ import {
   GrievanceCategory, 
   CitizenProfile 
 } from '../types';
-import { INDIAN_STATES_DISTRICTS, CATEGORY_DETAILS } from '../data/mockData';
+import { INDIAN_STATES_DISTRICTS, CATEGORY_DETAILS, getLocalBodiesForDistrict } from '../data/mockData';
 
 interface RealTimeDemandDashboardProps {
   grievances: GrievanceItem[];
@@ -124,7 +124,7 @@ export const RealTimeDemandDashboard: React.FC<RealTimeDemandDashboardProps> = (
   }, [geoScope, selectedState, selectedDistrict, selectedLocalBody, selectedWard]);
 
   const availableDistricts = INDIAN_STATES_DISTRICTS[selectedState]?.districts || [];
-  const availableLocalBodies = INDIAN_STATES_DISTRICTS[selectedState]?.localBodies[selectedDistrict] || [];
+  const availableLocalBodies = getLocalBodiesForDistrict(selectedState, selectedDistrict);
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 space-y-6">
@@ -197,7 +197,7 @@ export const RealTimeDemandDashboard: React.FC<RealTimeDemandDashboardProps> = (
                   const dists = INDIAN_STATES_DISTRICTS[st]?.districts || [];
                   if (dists.length > 0) {
                     setSelectedDistrict(dists[0]);
-                    const bodies = INDIAN_STATES_DISTRICTS[st]?.localBodies[dists[0]] || [];
+                    const bodies = getLocalBodiesForDistrict(st, dists[0]);
                     if (bodies.length > 0) setSelectedLocalBody(bodies[0]);
                   }
                 }}
@@ -217,7 +217,7 @@ export const RealTimeDemandDashboard: React.FC<RealTimeDemandDashboardProps> = (
                   onChange={(e) => {
                     const d = e.target.value;
                     setSelectedDistrict(d);
-                    const bodies = INDIAN_STATES_DISTRICTS[selectedState]?.localBodies[d] || [];
+                    const bodies = getLocalBodiesForDistrict(selectedState, d);
                     if (bodies.length > 0) setSelectedLocalBody(bodies[0]);
                   }}
                   className="w-full text-xs px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 font-semibold text-slate-800"
