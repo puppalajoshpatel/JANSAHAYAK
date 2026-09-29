@@ -143,26 +143,26 @@ export const RealTimeDemandDashboard: React.FC<RealTimeDemandDashboardProps> = (
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 space-y-6">
       
-      {/* Top Hackathon & Ministry Evaluation Banner */}
+      {/* Civic Intelligence & Demand Aggregation Banner */}
       <div className="bg-linear-to-r from-slate-900 via-slate-800 to-slate-950 text-white rounded-2xl p-4 sm:p-5 shadow-md border border-slate-700/80 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex items-start gap-3">
           <div className="w-10 h-10 rounded-xl bg-amber-500/20 border border-amber-400/30 flex items-center justify-center text-amber-400 shrink-0 mt-0.5">
-            <Award className="w-5 h-5" />
+            <Building2 className="w-5 h-5" />
           </div>
           <div>
             <div className="flex flex-wrap items-center gap-2">
               <span className="text-[10px] font-extrabold uppercase tracking-widest text-amber-300 bg-amber-950/80 px-2 py-0.5 rounded border border-amber-500/30">
-                Evaluation Blueprint
+                Civic Demand Intelligence
               </span>
-              <span className="text-[11px] font-mono font-bold text-slate-300">
-                25% AI • 20% Reach • 15% Impact • 20% Scalability
+              <span className="text-[11px] font-medium text-slate-300">
+                AI Multimodal Triage • Pan-India Municipal Coverage • Real-Time Budget Linkage
               </span>
             </div>
             <h3 className="text-sm sm:text-base font-bold text-white mt-1">
-              National Civic Priority Gravity Index (CPI™) Active
+              Real-Time Civic Demand & Public Infrastructure Analytics
             </h3>
             <p className="text-xs text-slate-300/90 mt-0.5 max-w-2xl leading-relaxed">
-              Replaces arbitrary local population denominators with verified citizen co-signers, statutory severity weighting (Hospitals, Potable Water, Schools), and rapid cluster escalation velocity.
+              Aggregating verified citizen demand across municipal corporations and councils to eliminate ticket backlogs and direct public funds where communities need them most.
             </p>
           </div>
         </div>
@@ -173,7 +173,7 @@ export const RealTimeDemandDashboard: React.FC<RealTimeDemandDashboardProps> = (
             className="px-4 py-2.5 bg-linear-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-950 font-black text-xs rounded-xl shadow-md transition flex items-center gap-2 self-start md:self-auto shrink-0 cursor-pointer"
           >
             <Sparkles className="w-4 h-4 text-slate-950" />
-            <span>Open Ministry Dossier</span>
+            <span>Platform Architecture & Blueprint</span>
           </button>
         )}
       </div>

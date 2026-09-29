@@ -15,6 +15,7 @@ import {
   Lightbulb
 } from 'lucide-react';
 import { CitizenProfile } from '../types';
+import { ALL_INDIAN_STATE_LANGUAGES } from '../data/indianLanguages';
 
 interface HeaderProps {
   currentTab: 'dashboard' | 'form' | 'budget' | 'recommendations' | 'track';
@@ -27,17 +28,6 @@ interface HeaderProps {
   onOpenTrackModal: () => void;
   onOpenDossierModal?: () => void;
 }
-
-const LANGUAGES = [
-  { code: 'en', label: 'English', native: 'English' },
-  { code: 'hi', label: 'Hindi', native: 'हिन्दी' },
-  { code: 'ta', label: 'Tamil', native: 'தமிழ்' },
-  { code: 'te', label: 'Telugu', native: 'తెలుగు' },
-  { code: 'mr', label: 'Marathi', native: 'मराठी' },
-  { code: 'bn', label: 'Bengali', native: 'বাংলা' },
-  { code: 'kn', label: 'Kannada', native: 'ಕನ್ನಡ' },
-  { code: 'gu', label: 'Gujarati', native: 'ગુજરાતી' },
-];
 
 export const Header: React.FC<HeaderProps> = ({
   currentTab,
@@ -83,9 +73,9 @@ export const Header: React.FC<HeaderProps> = ({
                 className="bg-transparent text-white text-xs border-none outline-hidden cursor-pointer"
                 aria-label="Select Language"
               >
-                {LANGUAGES.map((lang) => (
+                {ALL_INDIAN_STATE_LANGUAGES.map((lang) => (
                   <option key={lang.code} value={lang.code} className="bg-slate-900 text-white">
-                    {lang.native} ({lang.label})
+                    {lang.native} ({lang.label}) — {lang.statesCovered.split(',')[0]}
                   </option>
                 ))}
               </select>
@@ -107,14 +97,14 @@ export const Header: React.FC<HeaderProps> = ({
             <div>
               <div className="flex items-center gap-2">
                 <h1 className="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight flex items-center gap-2">
-                  <span>Jan</span><span className="text-amber-600 font-black">Vichar</span>
+                  <span>Jana</span><span className="text-amber-600 font-black">Sahayak</span>
                   <span className="text-xs font-semibold px-2 py-0.5 bg-amber-100 text-amber-800 rounded-full border border-amber-300">
-                    जनविचार
+                    जन सहायक
                   </span>
                 </h1>
               </div>
               <p className="text-xs text-slate-600 font-medium">
-                National Citizen Redressal & Public Demand Intelligence Portal
+                AI-Powered Citizen Grievance & Civic Intelligence Platform • Team GRAVITY
               </p>
             </div>
           </div>
@@ -170,10 +160,7 @@ export const Header: React.FC<HeaderProps> = ({
                 className="flex items-center gap-1.5 px-3.5 py-2 bg-linear-to-r from-amber-600 via-amber-700 to-amber-800 hover:from-amber-700 hover:to-amber-900 text-white text-xs font-bold rounded-lg shadow-sm shadow-amber-700/20 border border-amber-500 transition cursor-pointer"
               >
                 <Sparkles className="w-3.5 h-3.5 text-amber-200" />
-                <span>Ministry Dossier & Criteria</span>
-                <span className="hidden xl:inline text-[10px] bg-amber-950/60 text-amber-200 px-1.5 py-0.2 rounded font-mono">
-                  25% AI • 20% Reach • 15% Impact • 20% Scale
-                </span>
+                <span>Architecture & Pilot Blueprint</span>
               </button>
             )}
           </div>

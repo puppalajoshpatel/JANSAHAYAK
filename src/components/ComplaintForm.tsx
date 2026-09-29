@@ -31,6 +31,7 @@ import {
 import { INDIAN_STATES_DISTRICTS, CATEGORY_DETAILS, getLocalBodiesForDistrict } from '../data/mockData';
 import { CivicVoiceRecorder } from './CivicVoiceRecorder';
 import { analyzeCitizenGrievance, AIAnalysisResult } from '../services/aiService';
+import { ALL_INDIAN_STATE_LANGUAGES } from '../data/indianLanguages';
 
 interface ComplaintFormProps {
   userProfile: CitizenProfile | null;
@@ -217,7 +218,7 @@ export const ComplaintForm: React.FC<ComplaintFormProps> = ({
         officialRemarks: [
           {
             date: new Date().toISOString().split('T')[0],
-            officer: 'JanVichar Gateway',
+            officer: 'Jana Sahayak Gateway',
             department: aiResult?.recommendedDepartment || 'Central Administrative Triage',
             comment: `Grievance registered under PAN token. Auto-routed to ${aiResult?.recommendedDepartment || 'Zonal Municipal Office'}. Demand Gravity: CDGI ${cpiScore}/100 with ${verifiedCoSigners} verified citizens.`
           }
@@ -581,22 +582,49 @@ export const ComplaintForm: React.FC<ComplaintFormProps> = ({
 
             {/* Description Textarea */}
             <div>
-              <div className="flex items-center justify-between mb-1">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 mb-1.5">
                 <label className="block text-xs font-semibold text-slate-700">
-                  Detailed Grievance Description (in English, Hindi, or any regional language)
+                  Detailed Grievance Description (Supports All 22+ Official Indian State Languages)
                 </label>
-                <span className="text-[11px] text-slate-400">
-                  {description.length} characters
-                </span>
+                
+                {/* State Language Template Quick-Select */}
+                <div className="flex items-center gap-1.5">
+                  <span className="text-[11px] text-amber-700 font-bold hidden sm:inline">
+                    State Language Sample:
+                  </span>
+                  <select
+                    onChange={(e) => {
+                      const selected = ALL_INDIAN_STATE_LANGUAGES.find(l => l.code === e.target.value);
+                      if (selected && selected.sampleVoicePrompt) {
+                        setDescription(selected.sampleVoicePrompt.text);
+                        triggerAiAnalysis(selected.sampleVoicePrompt.text);
+                      }
+                    }}
+                    defaultValue=""
+                    className="text-[11px] bg-amber-50 border border-amber-300 text-amber-900 rounded-lg px-2 py-0.5 font-medium outline-hidden cursor-pointer"
+                  >
+                    <option value="" disabled>Load State Language Sample...</option>
+                    {ALL_INDIAN_STATE_LANGUAGES.map((l) => (
+                      <option key={l.code} value={l.code}>
+                        {l.native} ({l.label}) — {l.region}
+                      </option>
+                    ))}
+                  </select>
+                </div>
               </div>
+
               <textarea
                 rows={4}
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                placeholder="Describe what happened, exact location, for how many days the issue has persisted, and how many citizens are impacted (e.g., 'हमारे वार्ड में पिछले 2 सप्ताह से पानी की मुख्य लाइन टूटी हुई है...')"
+                placeholder="Describe what happened in any state language (e.g. 'హైవే వద్ద మురుగు కాలువ పొంగిపొర్లుతోంది...', 'எங்கள் பகுதியில் அரசு ஆரம்ப சுகாதார நிலையத்தில் மருத்துவர் இல்லை...', 'আমাদের ওয়ার্ডের বাজার এলাকায় ১০ দিন ধরে আবর্জনা পরিষ্কার করা হয়নি...')"
                 className="w-full text-xs sm:text-sm p-3.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-amber-500 outline-hidden font-normal leading-relaxed"
                 required
               />
+              <div className="flex items-center justify-between text-[11px] text-slate-400 mt-1">
+                <span>AI will automatically translate and extract category, scheme, and urgency.</span>
+                <span>{description.length} characters</span>
+              </div>
             </div>
 
             {/* AI AUTO-CLASSIFICATION TRIGGER BUTTON */}
@@ -608,7 +636,7 @@ export const ComplaintForm: React.FC<ComplaintFormProps> = ({
                 className="flex items-center gap-2 px-4 py-2 bg-linear-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 disabled:from-slate-200 disabled:to-slate-300 text-white disabled:text-slate-500 text-xs font-bold rounded-xl shadow-xs transition cursor-pointer disabled:cursor-not-allowed"
               >
                 <Sparkles className="w-4 h-4 text-amber-300" />
-                <span>{isAnalyzingAI ? 'JanVichar Analyzing...' : 'Analyze & Auto-Classify with AI'}</span>
+                <span>{isAnalyzingAI ? 'Jana Sahayak AI Analyzing...' : 'Analyze & Auto-Classify with AI'}</span>
               </button>
 
               <span className="text-[11px] text-slate-500 hidden sm:inline">

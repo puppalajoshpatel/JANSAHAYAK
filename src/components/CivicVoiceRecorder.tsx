@@ -12,45 +12,12 @@ import {
   AudioWaveform
 } from 'lucide-react';
 import { transcribeAudioWithAI } from '../services/aiService';
+import { ALL_INDIAN_STATE_LANGUAGES, IndianLanguage } from '../data/indianLanguages';
 
 interface CivicVoiceRecorderProps {
   onTranscriptReady: (transcript: string, detectedLang?: string) => void;
   selectedLanguage: string;
 }
-
-const VOICE_LANGUAGES = [
-  { code: 'hi-IN', label: 'Hindi (हिन्दी)' },
-  { code: 'en-IN', label: 'English (India)' },
-  { code: 'mr-IN', label: 'Marathi (मराठी)' },
-  { code: 'ta-IN', label: 'Tamil (தமிழ்)' },
-  { code: 'te-IN', label: 'Telugu (తెలుగు)' },
-  { code: 'bn-IN', label: 'Bengali (বাংলা)' },
-  { code: 'kn-IN', label: 'Kannada (ಕನ್ನಡ)' },
-  { code: 'gu-IN', label: 'Gujarati (ગુજરાતી)' },
-];
-
-const PRESET_VOICE_SAMPLES = [
-  {
-    lang: 'hi-IN',
-    label: 'हिन्दी: पौड रोड पर बड़े गड्ढे (Roads)',
-    text: 'हमारे वार्ड 14 में पौड रोड पर बहुत गहरे गड्ढे हो गए हैं। पिछले दो हफ्ते में कई दोपहिया वाहन गिर चुके हैं और भारी ट्रैफिक जाम रहता है। कृपया तुरंत सड़क की मरम्मत करवाएं।'
-  },
-  {
-    lang: 'hi-IN',
-    label: 'हिन्दी: अस्पताल में दवा और डॉक्टर की कमी (Hospitals)',
-    text: 'सिगरा जिला अस्पताल में बाल रोग विशेषज्ञ डॉक्टर उपलब्ध नहीं हैं और आवश्यक एंटीबायोटिक्स दवाएं खत्म हो गई हैं। मरीजों को 4 घंटे कतार में खड़ा रहना पड़ रहा है।'
-  },
-  {
-    lang: 'en-IN',
-    label: 'English: Stormwater Drain Clogged (Drainage)',
-    text: 'The main stormwater rajakaluve near Outer Ring Road is blocked with construction debris. Even light rain is causing dark sewage water to flood the service road and residential basement.'
-  },
-  {
-    lang: 'mr-IN',
-    label: 'मराठी: सरकारी शाळेचे छप्पर दुरुस्ती (Schools)',
-    text: 'आमच्या परिसरातील सरकारी शाळेच्या छताचे प्लास्टर पडत आहे आणि बेंच तुटलेले आहेत. पावसाळ्यात वर्गात पाणी गळते, मुलांच्या सुरक्षिततेसाठी त्वरित दुरुस्ती हवी.'
-  }
-];
 
 export const CivicVoiceRecorder: React.FC<CivicVoiceRecorderProps> = ({
   onTranscriptReady,
@@ -62,6 +29,7 @@ export const CivicVoiceRecorder: React.FC<CivicVoiceRecorderProps> = ({
   const [recordingSeconds, setRecordingSeconds] = useState(0);
   const [liveTranscript, setLiveTranscript] = useState('');
   const [voiceLang, setVoiceLang] = useState('hi-IN');
+  const [selectedRegionFilter, setSelectedRegionFilter] = useState<string>('All');
   const [isProcessingAI, setIsProcessingAI] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
@@ -207,7 +175,7 @@ export const CivicVoiceRecorder: React.FC<CivicVoiceRecorderProps> = ({
     }
   };
 
-  const handleSelectPreset = (preset: typeof PRESET_VOICE_SAMPLES[0]) => {
+  const handleSelectPreset = (preset: { lang: string; text: string; label?: string }) => {
     setVoiceLang(preset.lang);
     setLiveTranscript(preset.text);
     onTranscriptReady(preset.text, preset.lang);
@@ -232,10 +200,12 @@ export const CivicVoiceRecorder: React.FC<CivicVoiceRecorderProps> = ({
             value={voiceLang}
             onChange={(e) => setVoiceLang(e.target.value)}
             disabled={isRecording}
-            className="text-xs bg-white border border-slate-300 rounded-lg px-2.5 py-1 text-slate-800 font-medium focus:ring-2 focus:ring-amber-500 outline-hidden"
+            className="text-xs bg-white border border-slate-300 rounded-lg px-2.5 py-1 text-slate-800 font-medium focus:ring-2 focus:ring-amber-500 outline-hidden max-w-[280px]"
           >
-            {VOICE_LANGUAGES.map((l) => (
-              <option key={l.code} value={l.code}>{l.label}</option>
+            {ALL_INDIAN_STATE_LANGUAGES.map((l) => (
+              <option key={l.code} value={l.speechCode}>
+                {l.native} ({l.label}) — {l.region}
+              </option>
             ))}
           </select>
         </div>
@@ -277,7 +247,7 @@ export const CivicVoiceRecorder: React.FC<CivicVoiceRecorderProps> = ({
             className="flex items-center gap-2.5 px-6 py-3 bg-linear-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 text-white font-bold text-sm rounded-full shadow-md shadow-amber-600/30 transition transform active:scale-95 cursor-pointer"
           >
             <Mic className="w-5 h-5" />
-            <span>Tap to Speak Complaint in Local Language</span>
+            <span>Tap to Speak Complaint in State Mother Tongue</span>
           </button>
         ) : (
           <button
@@ -290,8 +260,8 @@ export const CivicVoiceRecorder: React.FC<CivicVoiceRecorderProps> = ({
           </button>
         )}
 
-        <p className="mt-3 text-[11px] text-slate-500 text-center max-w-sm">
-          Speak naturally in your mother tongue (Hindi, Tamil, Marathi, Telugu, Bengali, Kannada, etc.). Our AI will transcribe, translate, and extract category and urgency.
+        <p className="mt-3 text-[11px] text-slate-500 text-center max-w-md">
+          Speak in any of India’s 22+ official state languages (Hindi, Telugu, Tamil, Marathi, Bengali, Kannada, Gujarati, Malayalam, Odia, Punjabi, Assamese, Urdu, etc.). Speech is transcribed and processed in real time.
         </p>
       </div>
 
@@ -345,28 +315,69 @@ export const CivicVoiceRecorder: React.FC<CivicVoiceRecorderProps> = ({
         </div>
       )}
 
-      {/* Preset Indian Voice Samples for instant evaluation */}
-      <div className="pt-2 border-t border-slate-200">
-        <div className="flex items-center gap-1.5 text-[11px] font-bold text-slate-600 mb-2">
-          <HelpCircle className="w-3.5 h-3.5 text-amber-600" />
-          <span>Quick 1-Click Real-world Indian Voice Grievance Samples:</span>
+      {/* Preset State Language Voice Samples */}
+      <div className="pt-3 border-t border-slate-200 space-y-2.5">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+          <div className="flex items-center gap-1.5 text-[11px] font-bold text-slate-700">
+            <HelpCircle className="w-3.5 h-3.5 text-amber-600" />
+            <span>Test Real-World Voice Samples from Indian States:</span>
+          </div>
+
+          {/* Region Tabs */}
+          <div className="flex items-center gap-1 overflow-x-auto no-scrollbar py-0.5">
+            {['All', 'North', 'South', 'East', 'West', 'Northeast'].map((r) => (
+              <button
+                key={r}
+                type="button"
+                onClick={() => setSelectedRegionFilter(r)}
+                className={`text-[10px] font-bold px-2 py-0.5 rounded-md transition cursor-pointer ${
+                  selectedRegionFilter === r
+                    ? 'bg-amber-600 text-white shadow-2xs'
+                    : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-100'
+                }`}
+              >
+                {r}
+              </button>
+            ))}
+          </div>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-          {PRESET_VOICE_SAMPLES.map((sample, idx) => (
-            <button
-              key={idx}
-              type="button"
-              onClick={() => handleSelectPreset(sample)}
-              className="text-left p-2.5 rounded-lg bg-white hover:bg-amber-50 border border-slate-200 hover:border-amber-300 text-xs text-slate-700 hover:text-slate-900 transition flex flex-col gap-0.5 shadow-2xs group cursor-pointer"
-            >
-              <span className="font-bold text-slate-900 group-hover:text-amber-800">
-                {sample.label}
-              </span>
-              <span className="text-[11px] text-slate-500 line-clamp-1 italic">
-                "{sample.text}"
-              </span>
-            </button>
-          ))}
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 max-h-64 overflow-y-auto pr-1">
+          {ALL_INDIAN_STATE_LANGUAGES
+            .filter((lang) => 
+              lang.sampleVoicePrompt && 
+              (selectedRegionFilter === 'All' || lang.region === selectedRegionFilter || (selectedRegionFilter === 'North' && lang.region === 'Pan-India'))
+            )
+            .map((lang) => {
+              const sample = lang.sampleVoicePrompt!;
+              return (
+                <button
+                  key={lang.code}
+                  type="button"
+                  onClick={() => {
+                    setVoiceLang(lang.speechCode);
+                    setLiveTranscript(sample.text);
+                    onTranscriptReady(sample.text, lang.speechCode);
+                  }}
+                  className="text-left p-2.5 rounded-lg bg-white hover:bg-amber-50/80 border border-slate-200 hover:border-amber-300 text-xs text-slate-700 hover:text-slate-900 transition flex flex-col gap-1 shadow-2xs group cursor-pointer"
+                >
+                  <div className="flex items-center justify-between gap-1">
+                    <span className="font-bold text-slate-900 group-hover:text-amber-800 text-[11px] truncate">
+                      {lang.native} ({lang.label})
+                    </span>
+                    <span className="text-[9px] bg-slate-100 text-slate-600 px-1.5 py-0.2 rounded font-semibold shrink-0">
+                      {lang.region}
+                    </span>
+                  </div>
+                  <div className="text-[10px] text-slate-500 font-medium line-clamp-1">
+                    {lang.statesCovered.split(',').slice(0, 2).join(',')}
+                  </div>
+                  <div className="text-[11px] text-slate-800 font-medium line-clamp-2 italic bg-slate-50 p-1.5 rounded border border-slate-100">
+                    "{sample.text}"
+                  </div>
+                </button>
+              );
+            })}
         </div>
       </div>
     </div>

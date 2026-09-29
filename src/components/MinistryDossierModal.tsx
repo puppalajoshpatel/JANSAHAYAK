@@ -40,37 +40,37 @@ export const MinistryDossierModal: React.FC<MinistryDossierModalProps> = ({
   const criteria = [
     {
       id: 'challenge' as const,
-      badge: 'Challenge Alignment',
-      weight: 'Core Mission',
+      badge: 'Civic Problem Solved',
+      weight: 'Core Architecture',
       title: 'Direct Solution to Grievance Disillusionment',
       icon: TargetIcon
     },
     {
       id: 'ai' as const,
-      badge: 'AI / Technical Execution',
-      weight: '25% Weight',
+      badge: 'AI & Multilingual Triage',
+      weight: 'Google Gemini 3.8',
       title: 'Google Gemini 3.8 Flash Multimodal Triage',
       icon: Cpu
     },
     {
       id: 'reach' as const,
-      badge: 'Depth & Reach Across India',
-      weight: '20% Weight',
+      badge: 'Pan-India Reach & Tiering',
+      weight: 'All 36 States / UTs',
       title: '36 States/UTs, 780+ Districts & Local Bodies',
       icon: Globe2
     },
     {
       id: 'impact' as const,
-      badge: 'Impact Potential',
-      weight: '15% Weight',
+      badge: 'Quantified Civic Impact',
+      weight: 'Fiscal Accountability',
       title: 'Quantified Benefit & Civic Fiscal Accountability',
       icon: TrendingUp
     },
     {
       id: 'deployability' as const,
-      badge: 'Deployability & Scalability',
-      weight: '20% Weight',
-      title: 'Ministry Pilot in 4 Weeks (DARPG / MoHUA)',
+      badge: 'Ministry Pilot Blueprint',
+      weight: 'Turnkey Pilot',
+      title: 'Ministry Pilot Ready (DARPG / MoHUA)',
       icon: Rocket
     }
   ];
@@ -83,19 +83,19 @@ export const MinistryDossierModal: React.FC<MinistryDossierModalProps> = ({
         <div className="bg-linear-to-r from-slate-900 via-slate-800 to-slate-900 text-white p-5 flex items-center justify-between shrink-0 border-b border-slate-700">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-amber-500/20 border border-amber-400/40 flex items-center justify-center text-amber-400 shadow-inner">
-              <Award className="w-5 h-5" />
+              <Building2 className="w-5 h-5" />
             </div>
             <div>
               <div className="flex items-center gap-2">
                 <span className="text-[11px] font-extrabold uppercase tracking-widest text-amber-400 bg-amber-950/60 px-2 py-0.5 rounded border border-amber-500/30">
-                  GovTech Architecture & Evaluation Dossier
+                  National Civic Platform Architecture
                 </span>
                 <span className="text-[10px] bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded border border-emerald-400/30 font-bold">
-                  Hackathon Ready
+                  Production Blueprint
                 </span>
               </div>
               <h2 className="text-base sm:text-lg font-bold text-white mt-0.5">
-                JanSamadhan 3.0: National Citizen Grievance & Budget Transparency Engine
+                Jana Sahayak: AI-Powered Citizen Grievance & Civic Intelligence Platform (Team GRAVITY)
               </h2>
             </div>
           </div>
@@ -187,7 +187,7 @@ export const MinistryDossierModal: React.FC<MinistryDossierModalProps> = ({
             </div>
           )}
 
-          {/* SECTION 2: 25% AI & TECHNICAL EXECUTION */}
+          {/* SECTION 2: AI & TECHNICAL EXECUTION */}
           {activeCriterion === 'ai' && (
             <div className="space-y-5 animate-in fade-in duration-150">
               <div className="p-4 rounded-xl bg-purple-50/70 border border-purple-200">
@@ -260,7 +260,7 @@ export const MinistryDossierModal: React.FC<MinistryDossierModalProps> = ({
             </div>
           )}
 
-          {/* SECTION 3: 20% DEPTH & REACH ACROSS INDIA */}
+          {/* SECTION 3: DEPTH & REACH ACROSS INDIA */}
           {activeCriterion === 'reach' && (
             <div className="space-y-5 animate-in fade-in duration-150">
               <div className="p-4 rounded-xl bg-blue-50/70 border border-blue-200">
@@ -307,7 +307,7 @@ export const MinistryDossierModal: React.FC<MinistryDossierModalProps> = ({
             </div>
           )}
 
-          {/* SECTION 4: 15% IMPACT POTENTIAL */}
+          {/* SECTION 4: IMPACT POTENTIAL */}
           {activeCriterion === 'impact' && (
             <div className="space-y-5 animate-in fade-in duration-150">
               <div className="p-4 rounded-xl bg-emerald-50/70 border border-emerald-200">
@@ -356,7 +356,7 @@ export const MinistryDossierModal: React.FC<MinistryDossierModalProps> = ({
             </div>
           )}
 
-          {/* SECTION 5: 20% DEPLOYABILITY & SCALABILITY */}
+          {/* SECTION 5: DEPLOYABILITY & SCALABILITY */}
           {activeCriterion === 'deployability' && (
             <div className="space-y-5 animate-in fade-in duration-150">
               <div className="p-4 rounded-xl bg-slate-900 text-white border border-slate-700">
