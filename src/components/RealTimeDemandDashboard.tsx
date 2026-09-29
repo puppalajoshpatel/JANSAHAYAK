@@ -23,7 +23,8 @@ import {
   Sparkles,
   Award,
   Sliders,
-  Scale
+  Scale,
+  Languages
 } from 'lucide-react';
 import { 
   GrievanceItem, 
@@ -33,6 +34,7 @@ import {
 } from '../types';
 import { INDIAN_STATES_DISTRICTS, CATEGORY_DETAILS, getLocalBodiesForDistrict } from '../data/mockData';
 import { calculateCivicPriorityIndex } from '../services/gravityIndex';
+import { getLocalizedCategory, t } from '../services/localization';
 
 interface RealTimeDemandDashboardProps {
   grievances: GrievanceItem[];
@@ -42,6 +44,10 @@ interface RealTimeDemandDashboardProps {
   onOpenAuthModal: () => void;
   onSelectGrievanceDetail: (grievance: GrievanceItem) => void;
   onOpenDossierModal?: () => void;
+  selectedLanguage?: string;
+  isFullRegionalUI?: boolean;
+  onOpenLanguageModal?: () => void;
+  onOpenSyncModal?: () => void;
 }
 
 export const RealTimeDemandDashboard: React.FC<RealTimeDemandDashboardProps> = ({
@@ -51,7 +57,11 @@ export const RealTimeDemandDashboard: React.FC<RealTimeDemandDashboardProps> = (
   userProfile,
   onOpenAuthModal,
   onSelectGrievanceDetail,
-  onOpenDossierModal
+  onOpenDossierModal,
+  selectedLanguage = 'en',
+  isFullRegionalUI = false,
+  onOpenLanguageModal,
+  onOpenSyncModal
 }) => {
   // Geo Scope Filter
   const [geoScope, setGeoScope] = useState<'country' | 'state' | 'district' | 'localBody' | 'ward'>('country');
@@ -167,15 +177,38 @@ export const RealTimeDemandDashboard: React.FC<RealTimeDemandDashboardProps> = (
           </div>
         </div>
 
-        {onOpenDossierModal && (
-          <button
-            onClick={onOpenDossierModal}
-            className="px-4 py-2.5 bg-linear-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-950 font-black text-xs rounded-xl shadow-md transition flex items-center gap-2 self-start md:self-auto shrink-0 cursor-pointer"
-          >
-            <Sparkles className="w-4 h-4 text-slate-950" />
-            <span>Platform Architecture & Blueprint</span>
-          </button>
-        )}
+        <div className="flex flex-wrap items-center gap-2 self-start md:self-auto shrink-0">
+          {onOpenSyncModal && (
+            <button
+              onClick={onOpenSyncModal}
+              className="px-3.5 py-2 bg-emerald-950/80 hover:bg-emerald-900 border border-emerald-500/40 text-emerald-300 font-bold text-xs rounded-xl shadow-xs transition flex items-center gap-1.5 cursor-pointer"
+              title="Click to view automated Gazette and Policy Scheme Sync"
+            >
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+              <span>Infra Policy Sync: Live</span>
+            </button>
+          )}
+
+          {onOpenLanguageModal && (
+            <button
+              onClick={onOpenLanguageModal}
+              className="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 border border-slate-600 text-amber-300 font-bold text-xs rounded-xl shadow-xs transition flex items-center gap-1.5 cursor-pointer"
+            >
+              <Languages className="w-3.5 h-3.5 text-amber-400" />
+              <span>Change Language</span>
+            </button>
+          )}
+
+          {onOpenDossierModal && (
+            <button
+              onClick={onOpenDossierModal}
+              className="px-4 py-2 bg-linear-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-950 font-black text-xs rounded-xl shadow-md transition flex items-center gap-2 cursor-pointer"
+            >
+              <Sparkles className="w-4 h-4 text-slate-950" />
+              <span>Blueprint</span>
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Scope & Geographic Intelligence Header */}
@@ -391,6 +424,7 @@ export const RealTimeDemandDashboard: React.FC<RealTimeDemandDashboardProps> = (
               ? Math.round(catItems.reduce((acc, c) => acc + (c.civicPriorityIndex || c.affectedMembersCount), 0) / catItems.length)
               : 0;
             const hasHigh = catItems.some((g) => g.demandTier === 'high');
+            const localized = getLocalizedCategory(key as any, selectedLanguage);
 
             return (
               <button
@@ -404,14 +438,18 @@ export const RealTimeDemandDashboard: React.FC<RealTimeDemandDashboardProps> = (
               >
                 <div>
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-slate-800 truncate">{cat.label.split(' ')[0]}</span>
+                    <span className="text-xs font-bold text-slate-800 truncate">
+                      {isFullRegionalUI ? localized.regional : cat.label.split(' ')[0]}
+                    </span>
                     {hasHigh && (
                       <span className="text-[9px] bg-rose-100 text-rose-800 font-black px-1.5 py-0.2 rounded-full border border-rose-300">
                         HOT
                       </span>
                     )}
                   </div>
-                  <span className="text-[10px] text-slate-500 block truncate">{cat.hindi}</span>
+                  <span className="text-[10px] text-slate-500 block truncate">
+                    {isFullRegionalUI ? cat.label : localized.regional}
+                  </span>
                 </div>
                 <div className="mt-2 flex items-baseline justify-between">
                   <span className="text-[11px] text-slate-500">{catItems.length} issues</span>
@@ -563,7 +601,12 @@ export const RealTimeDemandDashboard: React.FC<RealTimeDemandDashboardProps> = (
                   <div className="flex items-center gap-2">
                     <span className={`px-2.5 py-1 rounded-lg text-xs font-bold border flex items-center gap-1.5 ${cat.bg} ${cat.color} ${cat.border}`}>
                       <Layers className="w-3.5 h-3.5" />
-                      <span>{cat.label}</span>
+                      <span>{isFullRegionalUI ? getLocalizedCategory(item.category, selectedLanguage).regional : cat.label}</span>
+                      {!isFullRegionalUI && selectedLanguage !== 'en' && (
+                        <span className="text-[10px] opacity-80 font-normal">
+                          ({getLocalizedCategory(item.category, selectedLanguage).regional})
+                        </span>
+                      )}
                     </span>
 
                     <span className={`px-2.5 py-0.5 rounded-full text-xs font-extrabold uppercase tracking-wide border flex items-center gap-1.5 ${
@@ -683,7 +726,7 @@ export const RealTimeDemandDashboard: React.FC<RealTimeDemandDashboardProps> = (
                           }`}
                         >
                           <ThumbsUp className={`w-3.5 h-3.5 ${item.userHasEndorsed ? 'fill-current' : ''}`} />
-                          <span>{item.userHasEndorsed ? 'Endorsed (+1)' : 'I Am Also Affected (+1 Me Too)'}</span>
+                          <span>{item.userHasEndorsed ? t('action_cosigned', selectedLanguage) : t('action_cosign', selectedLanguage)}</span>
                         </button>
                       </div>
                     </div>

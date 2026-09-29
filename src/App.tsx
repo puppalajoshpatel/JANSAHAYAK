@@ -22,6 +22,11 @@ import { BudgetProjectTracker } from './components/BudgetProjectTracker';
 import { DevelopmentRecommender } from './components/DevelopmentRecommender';
 import { PanAuthModal } from './components/PanAuthModal';
 import { GrievanceTrackerModal } from './components/GrievanceTrackerModal';
+import { LanguageSwitchModal } from './components/LanguageSwitchModal';
+import { InfrastructureSyncModal } from './components/InfrastructureSyncModal';
+import { MinistryDossierModal } from './components/MinistryDossierModal';
+import { ALL_INDIAN_STATE_LANGUAGES } from './data/indianLanguages';
+import { Languages, RefreshCw } from 'lucide-react';
 
 export default function App() {
   const [currentTab, setCurrentTab] = useState<'dashboard' | 'form' | 'budget' | 'recommendations' | 'track'>('dashboard');
@@ -52,10 +57,16 @@ export default function App() {
   });
 
   const [selectedLanguage, setSelectedLanguage] = useState<string>('en');
+  const [isFullRegionalUI, setIsFullRegionalUI] = useState<boolean>(false);
+  const [isLanguageModalOpen, setIsLanguageModalOpen] = useState(false);
+  const [isSyncModalOpen, setIsSyncModalOpen] = useState(false);
+  const [isDossierModalOpen, setIsDossierModalOpen] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isTrackModalOpen, setIsTrackModalOpen] = useState(false);
   const [selectedProjectForTimeline, setSelectedProjectForTimeline] = useState<GrievanceItem | null>(null);
   const [selectedGrievanceForDetail, setSelectedGrievanceForDetail] = useState<GrievanceItem | null>(null);
+
+  const currentLangObj = ALL_INDIAN_STATE_LANGUAGES.find(l => l.code === selectedLanguage) || ALL_INDIAN_STATE_LANGUAGES[0];
 
   // Sync grievances to localStorage
   useEffect(() => {
@@ -142,6 +153,10 @@ export default function App() {
           setSelectedGrievanceForDetail(null);
           setIsTrackModalOpen(true);
         }}
+        onOpenDossierModal={() => setIsDossierModalOpen(true)}
+        onOpenLanguageModal={() => setIsLanguageModalOpen(true)}
+        onOpenSyncModal={() => setIsSyncModalOpen(true)}
+        isFullRegionalUI={isFullRegionalUI}
       />
 
       {/* Main Content Area */}
@@ -154,6 +169,11 @@ export default function App() {
             userProfile={userProfile}
             onOpenAuthModal={() => setIsAuthModalOpen(true)}
             onSelectGrievanceDetail={handleOpenGrievanceDetail}
+            onOpenDossierModal={() => setIsDossierModalOpen(true)}
+            selectedLanguage={selectedLanguage}
+            isFullRegionalUI={isFullRegionalUI}
+            onOpenLanguageModal={() => setIsLanguageModalOpen(true)}
+            onOpenSyncModal={() => setIsSyncModalOpen(true)}
           />
         )}
 
@@ -214,6 +234,47 @@ export default function App() {
         onEndorse={handleEndorse}
       />
 
+      {/* Regional Language Switch Modal */}
+      <LanguageSwitchModal
+        isOpen={isLanguageModalOpen}
+        onClose={() => setIsLanguageModalOpen(false)}
+        selectedLanguage={selectedLanguage}
+        onSelectLanguage={setSelectedLanguage}
+        isFullRegionalUI={isFullRegionalUI}
+        onToggleFullRegionalUI={setIsFullRegionalUI}
+      />
+
+      {/* Infrastructure Policy & Gazette Sync Modal */}
+      <InfrastructureSyncModal
+        isOpen={isSyncModalOpen}
+        onClose={() => setIsSyncModalOpen(false)}
+      />
+
+      {/* Architecture & Pilot Blueprint Dossier Modal */}
+      <MinistryDossierModal
+        isOpen={isDossierModalOpen}
+        onClose={() => setIsDossierModalOpen(false)}
+        onSwitchToTab={(tab) => {
+          setIsDossierModalOpen(false);
+          setCurrentTab(tab);
+        }}
+      />
+
+      {/* Floating State Language Switcher Pill */}
+      <aside aria-label="Language selection" className="fixed bottom-5 right-5 z-40 flex items-center gap-2">
+        <button
+          onClick={() => setIsLanguageModalOpen(true)}
+          className="flex items-center gap-2 px-3.5 py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs rounded-full shadow-lg border border-amber-400/50 hover:border-amber-400 transition transform active:scale-95 cursor-pointer ring-2 ring-slate-900/10"
+          title="Change State Language / ਆਪਣੀ ਭਾਸ਼ਾ ਬਦਲੋ / உங்கள் மொழியை மாற்றவும்"
+        >
+          <Languages className="w-4 h-4 text-amber-400" />
+          <span>{currentLangObj.native}</span>
+          <span className="hidden sm:inline text-[11px] text-amber-200">
+            ({isFullRegionalUI ? 'Regional UI' : 'Bilingual'})
+          </span>
+        </button>
+      </aside>
+
       {/* Official Government Footer */}
       <footer className="bg-slate-900 text-slate-400 text-xs border-t border-slate-800 mt-12">
         {/* Tricolor Bottom Strip */}
@@ -229,9 +290,9 @@ export default function App() {
             <div className="space-y-3">
               <div className="flex items-center gap-2 text-white font-bold text-base">
                 <div className="w-8 h-8 rounded-lg bg-amber-600 flex items-center justify-center text-white font-black text-sm">
-                  JV
+                  JS
                 </div>
-                <span>JanVichar</span>
+                <span>Jana Sahayak</span>
               </div>
               <p className="text-xs text-slate-400 leading-relaxed">
                 National Citizen Redressal and Area Development Intelligence Platform. Integrated with CPGRAMS, Municipal GIS, and Public Financial Management System (PFMS).

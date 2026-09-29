@@ -12,10 +12,13 @@ import {
   Globe2, 
   Sparkles,
   PhoneCall,
-  Lightbulb
+  Lightbulb,
+  Languages,
+  RefreshCw
 } from 'lucide-react';
 import { CitizenProfile } from '../types';
 import { ALL_INDIAN_STATE_LANGUAGES } from '../data/indianLanguages';
+import { t } from '../services/localization';
 
 interface HeaderProps {
   currentTab: 'dashboard' | 'form' | 'budget' | 'recommendations' | 'track';
@@ -27,6 +30,9 @@ interface HeaderProps {
   onChangeLanguage: (lang: string) => void;
   onOpenTrackModal: () => void;
   onOpenDossierModal?: () => void;
+  onOpenLanguageModal?: () => void;
+  onOpenSyncModal?: () => void;
+  isFullRegionalUI?: boolean;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -38,8 +44,12 @@ export const Header: React.FC<HeaderProps> = ({
   selectedLanguage,
   onChangeLanguage,
   onOpenTrackModal,
-  onOpenDossierModal
+  onOpenDossierModal,
+  onOpenLanguageModal,
+  onOpenSyncModal,
+  isFullRegionalUI = false
 }) => {
+  const currentLangObj = ALL_INDIAN_STATE_LANGUAGES.find(l => l.code === selectedLanguage) || ALL_INDIAN_STATE_LANGUAGES[0];
   return (
     <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-xs">
       {/* Top Gov Tricolor & Accessibility Strip */}
@@ -154,6 +164,32 @@ export const Header: React.FC<HeaderProps> = ({
               <span>Track Token</span>
             </button>
 
+            {onOpenLanguageModal && (
+              <button
+                onClick={onOpenLanguageModal}
+                className="flex items-center gap-1.5 px-3 py-2 bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300 text-xs font-bold rounded-lg shadow-2xs transition cursor-pointer"
+                title="Change State Language / अपनी भाषा चुनें"
+              >
+                <Languages className="w-4 h-4 text-amber-700" />
+                <span>{currentLangObj.native}</span>
+                <span className="hidden xl:inline text-[10px] text-amber-800/80 font-normal">
+                  ({currentLangObj.label})
+                </span>
+              </button>
+            )}
+
+            {onOpenSyncModal && (
+              <button
+                onClick={onOpenSyncModal}
+                className="hidden md:flex items-center gap-1.5 px-3 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-900 border border-emerald-300 text-xs font-semibold rounded-lg shadow-2xs transition cursor-pointer"
+                title="Automated Indian Infrastructure Policy & Gazette Sync"
+              >
+                <RefreshCw className="w-3.5 h-3.5 text-emerald-700" />
+                <span>Infra Sync</span>
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+              </button>
+            )}
+
             {onOpenDossierModal && (
               <button
                 onClick={onOpenDossierModal}
@@ -177,7 +213,7 @@ export const Header: React.FC<HeaderProps> = ({
             }`}
           >
             <BarChart3 className="w-4 h-4" />
-            <span>Real-Time Demand Dashboard</span>
+            <span>{isFullRegionalUI ? t('tab_dashboard', selectedLanguage) : 'Real-Time Demand Dashboard'}</span>
             <span className={`text-[10px] px-1.5 py-0.2 rounded-full ${
               currentTab === 'dashboard' ? 'bg-amber-700 text-amber-100' : 'bg-slate-200 text-slate-700'
             }`}>
@@ -194,7 +230,7 @@ export const Header: React.FC<HeaderProps> = ({
             }`}
           >
             <FileText className="w-4 h-4" />
-            <span>Apply for Grievance / Voice & Text</span>
+            <span>{isFullRegionalUI ? t('tab_form', selectedLanguage) : 'Apply for Grievance / Voice & Text'}</span>
             <span className={`text-[10px] px-1.5 py-0.2 rounded-full ${
               currentTab === 'form' ? 'bg-amber-700 text-amber-100' : 'bg-slate-200 text-slate-700'
             }`}>
@@ -211,7 +247,7 @@ export const Header: React.FC<HeaderProps> = ({
             }`}
           >
             <Coins className="w-4 h-4" />
-            <span>Budget & Timeline Tracker</span>
+            <span>{isFullRegionalUI ? t('tab_budget', selectedLanguage) : 'Budget & Timeline Tracker'}</span>
             <span className={`text-[10px] px-1.5 py-0.2 rounded-full ${
               currentTab === 'budget' ? 'bg-amber-700 text-amber-100' : 'bg-slate-200 text-slate-700'
             }`}>
@@ -228,7 +264,7 @@ export const Header: React.FC<HeaderProps> = ({
             }`}
           >
             <Lightbulb className="w-4 h-4 text-amber-300" />
-            <span>Citizen Area Recommendations</span>
+            <span>{isFullRegionalUI ? t('tab_recommendations', selectedLanguage) : 'Citizen Area Recommendations'}</span>
           </button>
         </nav>
       </div>
