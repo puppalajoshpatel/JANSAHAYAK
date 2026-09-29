@@ -109,23 +109,23 @@ export const DevelopmentRecommender: React.FC<DevelopmentRecommenderProps> = ({
                   <div className="flex items-center justify-between text-xs">
                     <span className="font-bold text-slate-700 flex items-center gap-1.5">
                       <Users className="w-3.5 h-3.5 text-amber-600" />
-                      Citizen Demand Density:
+                      Citizen Demand Gravity:
                     </span>
                     <span className="font-bold text-slate-900 font-mono bg-white px-2 py-0.5 rounded border border-slate-200">
-                      <strong className="text-amber-700">{item.affectedMembersCount}</strong> / 100 Members
+                      <strong className="text-emerald-700">CPI {item.civicPriorityIndex || item.affectedMembersCount}</strong> / 100
                     </span>
                   </div>
 
                   <div className="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
                     <div 
                       className="bg-emerald-600 h-full rounded-full transition-all duration-300"
-                      style={{ width: `${item.affectedMembersCount}%` }}
+                      style={{ width: `${item.civicPriorityIndex || item.affectedMembersCount}%` }}
                     />
                   </div>
 
                   <div className="flex items-center justify-between text-[11px] text-slate-500">
-                    <span>{item.totalCommunityEndorsements} Citizens Endorsed</span>
-                    <span className="text-slate-400">Target for Budget: 35/100</span>
+                    <span>{item.totalCommunityEndorsements} Verified Citizen Votes</span>
+                    <span className="text-slate-500">Sanction Threshold: CPI 60</span>
                   </div>
                 </div>
 

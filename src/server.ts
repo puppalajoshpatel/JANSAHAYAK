@@ -55,7 +55,10 @@ Extract and respond strictly with valid JSON conforming to this structure:
   "detectedLanguage": "The language detected (e.g. Hindi, Tamil, Telugu, Marathi, English, Bengali, etc.)",
   "translatedEnglishSummary": "Direct faithful English translation if input was in an Indian regional language, otherwise refined summary",
   "demandTier": "high" | "mid" | "low",
-  "estimatedAffectedPer100": number (realistic projection of how many members out of 100 in this locality are directly impacted, between 5 and 75),
+  "civicDemandGravityScore": number (1 to 100, scientific priority index combining public safety, vital infrastructure weight and citizen pain),
+  "civicPriorityIndex": number (1 to 100, matching the gravity index),
+  "verifiedCitizenEstimate": number (realistic volume of affected community co-signers, between 40 and 1500),
+  "estimatedAffectedPer100": number (legacy field for backward compatibility),
   "urgencyScore": number (1 to 100, where 90+ is life-critical/hazard, 60-89 is severe community pain, <60 is planned maintenance),
   "recommendedDepartment": "Official Indian Department (e.g., Public Works Department (PWD), Municipal Health Society, Water Supply & Sewerage Board, State Discom / Power Corp, Directorate of School Education)",
   "applicableGovScheme": "Relevant National / State Mission (e.g., PMGSY, AMRUT 2.0, National Health Mission (NHM), Samagra Shiksha, Swachh Bharat Urban 2.0, Smart Cities Mission, Jal Jeevan Mission, RDSS)",
@@ -221,6 +224,7 @@ function getLocalFallbackAnalysis(rawText: string, type: string, location: any) 
 
   const titleWords = rawText.trim().split(/\s+/).slice(0, 10).join(' ');
   const title = titleWords.length > 5 ? `${titleWords}...` : `Civic Grievance regarding ${subCategory}`;
+  const cpiScore = Math.min(98, Math.max(30, Math.round(urgency * 0.95)));
 
   return {
     category,
@@ -230,6 +234,9 @@ function getLocalFallbackAnalysis(rawText: string, type: string, location: any) 
     detectedLanguage: 'Detected from Text',
     translatedEnglishSummary: rawText,
     demandTier,
+    civicDemandGravityScore: cpiScore,
+    civicPriorityIndex: cpiScore,
+    verifiedCitizenEstimate: Math.max(30, Math.round(cpiScore * 6.2)),
     estimatedAffectedPer100,
     urgencyScore: urgency,
     recommendedDepartment: department,

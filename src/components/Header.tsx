@@ -25,6 +25,7 @@ interface HeaderProps {
   selectedLanguage: string;
   onChangeLanguage: (lang: string) => void;
   onOpenTrackModal: () => void;
+  onOpenDossierModal?: () => void;
 }
 
 const LANGUAGES = [
@@ -46,7 +47,8 @@ export const Header: React.FC<HeaderProps> = ({
   onLogout,
   selectedLanguage,
   onChangeLanguage,
-  onOpenTrackModal
+  onOpenTrackModal,
+  onOpenDossierModal
 }) => {
   return (
     <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-xs">
@@ -156,11 +158,24 @@ export const Header: React.FC<HeaderProps> = ({
 
             <button
               onClick={onOpenTrackModal}
-              className="flex items-center gap-1.5 px-3 py-2 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold rounded-lg border border-slate-300 shadow-2xs transition"
+              className="flex items-center gap-1.5 px-3 py-2 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold rounded-lg border border-slate-300 shadow-2xs transition cursor-pointer"
             >
               <Search className="w-3.5 h-3.5 text-slate-500" />
               <span>Track Token</span>
             </button>
+
+            {onOpenDossierModal && (
+              <button
+                onClick={onOpenDossierModal}
+                className="flex items-center gap-1.5 px-3.5 py-2 bg-linear-to-r from-amber-600 via-amber-700 to-amber-800 hover:from-amber-700 hover:to-amber-900 text-white text-xs font-bold rounded-lg shadow-sm shadow-amber-700/20 border border-amber-500 transition cursor-pointer"
+              >
+                <Sparkles className="w-3.5 h-3.5 text-amber-200" />
+                <span>Ministry Dossier & Criteria</span>
+                <span className="hidden xl:inline text-[10px] bg-amber-950/60 text-amber-200 px-1.5 py-0.2 rounded font-mono">
+                  25% AI • 20% Reach • 15% Impact • 20% Scale
+                </span>
+              </button>
+            )}
           </div>
         </div>
 

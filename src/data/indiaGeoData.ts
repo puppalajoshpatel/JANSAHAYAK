@@ -741,40 +741,111 @@ export const ALL_INDIAN_STATES_DISTRICTS: Record<string, StateDistrictMap> = {
 };
 
 /**
- * Robust helper function that returns local bodies for ANY district in India.
- * If the district has specific municipal corporations or boards mapped, returns those.
- * Otherwise, dynamically generates the real administrative tiers:
- * [District Municipal Corporation, District Headquarters Nagar Palika Parishad, Zilla Parishad & Block Office, Ward / Panchayat Office]
+ * Comprehensive administrative hierarchy resolver for all 780+ districts of India.
+ * Guarantees that EVERY district without exception provides explicit options across all statutory urban & rural tiers:
+ * 1. [Municipal Corporation] (Mahanagar Palika / Nagar Nigam / City Corporation)
+ * 2. [Municipality] (Nagar Palika Parishad / Municipal Council / Purapalika)
+ * 3. [Town Panchayat] (Nagar Panchayat / Notified Town Board)
+ * 4. [Rural / Zilla Parishad] (Zilla Parishad & Block Development Samiti)
+ * 5. [Cantonment Board / Development Authority] (where applicable)
  */
 export function getLocalBodiesForDistrict(state: string, district: string): string[] {
+  const cleanDistrict = (district || 'District Headquarters').trim();
   const stateData = ALL_INDIAN_STATES_DISTRICTS[state];
-  if (!stateData) {
-    return [
-      `${district || 'City'} Municipal Corporation (Nagar Nigam)`,
-      `${district || 'Town'} Nagar Palika Parishad`,
-      'District Zilla Parishad & Block Dev Office',
-      'Gram Panchayat / Ward Office'
-    ];
+
+  // Specific mapped list if already curated
+  let rawMappedBodies: string[] = [];
+  if (stateData) {
+    if (stateData.localBodies[cleanDistrict] && stateData.localBodies[cleanDistrict].length > 0) {
+      rawMappedBodies = [...stateData.localBodies[cleanDistrict]];
+    } else {
+      const matchingKey = Object.keys(stateData.localBodies).find((k) => 
+        cleanDistrict.toLowerCase().includes(k.toLowerCase()) || k.toLowerCase().includes(cleanDistrict.toLowerCase())
+      );
+      if (matchingKey && stateData.localBodies[matchingKey]) {
+        rawMappedBodies = [...stateData.localBodies[matchingKey]];
+      }
+    }
   }
 
-  // Check direct district mapping
-  if (stateData.localBodies[district] && stateData.localBodies[district].length > 0) {
-    return stateData.localBodies[district];
+  // Categorize and prefix every local body name with its official administrative tier
+  const formatBodyWithTier = (rawName: string): string => {
+    const trimmed = rawName.replace(/^\[.*?\]\s*/, '').trim();
+    const lower = trimmed.toLowerCase();
+    if (
+      lower.includes('corporation') || 
+      lower.includes('nigam') || 
+      lower.includes('mahanagar palika') || 
+      lower.includes('mahanagara palike') ||
+      lower.includes('gvmc') || lower.includes('vmc') || lower.includes('gmc') || lower.includes('tmc') ||
+      lower.includes('bbmp') || lower.includes('bmc') || lower.includes('pmc') || lower.includes('pcmc') ||
+      lower.includes('ghmc') || lower.includes('gcc') || lower.includes('kmc')
+    ) {
+      return `[Municipal Corporation] ${trimmed}`;
+    }
+    if (lower.includes('cantonment') || lower.includes('cantt') || lower.includes('pcb') || lower.includes('kcb')) {
+      return `[Cantonment Board] ${trimmed}`;
+    }
+    if (lower.includes('development authority') || lower.includes('duda') || lower.includes('uda') || lower.includes('yeida') || lower.includes('noida') || lower.includes('gda')) {
+      return `[Development Authority] ${trimmed}`;
+    }
+    if (lower.includes('zilla parishad') || lower.includes('panchayat samiti') || lower.includes('block dev')) {
+      return `[Rural / Zilla Parishad] ${trimmed}`;
+    }
+    if (lower.includes('nagar panchayat') || lower.includes('town board') || lower.includes('town committee') || lower.includes('notified area')) {
+      return `[Town Panchayat] ${trimmed}`;
+    }
+    return `[Municipality] ${trimmed}`;
+  };
+
+  const formattedMapped = rawMappedBodies.map(formatBodyWithTier);
+
+  // Check presence of statutory tiers
+  const hasCorporation = formattedMapped.some((b) => b.startsWith('[Municipal Corporation]'));
+  const hasMunicipality = formattedMapped.some((b) => b.startsWith('[Municipality]'));
+  const hasPanchayat = formattedMapped.some((b) => b.startsWith('[Town Panchayat]'));
+  const hasRural = formattedMapped.some((b) => b.startsWith('[Rural / Zilla Parishad]'));
+
+  const bodies: string[] = [];
+
+  // 1. Ensure statutory Municipal Corporation / Nagar Nigam is always explicitly present
+  if (!hasCorporation) {
+    bodies.push(`[Municipal Corporation] ${cleanDistrict} Municipal Corporation (Mahanagar Palika / Nagar Nigam)`);
+  }
+  for (const b of formattedMapped.filter((b) => b.startsWith('[Municipal Corporation]'))) {
+    if (!bodies.includes(b)) bodies.push(b);
   }
 
-  // Check fuzzy or substring match
-  const matchingKey = Object.keys(stateData.localBodies).find((k) => 
-    district.toLowerCase().includes(k.toLowerCase()) || k.toLowerCase().includes(district.toLowerCase())
-  );
-  if (matchingKey && stateData.localBodies[matchingKey]) {
-    return stateData.localBodies[matchingKey];
+  // 2. Ensure statutory Municipal Council / Municipality is always explicitly present
+  if (!hasMunicipality) {
+    bodies.push(`[Municipality] ${cleanDistrict} Nagar Palika Parishad (Municipal Council)`);
+  }
+  for (const b of formattedMapped.filter((b) => b.startsWith('[Municipality]'))) {
+    if (!bodies.includes(b)) bodies.push(b);
   }
 
-  // Standard official Indian municipal hierarchy for the district
-  return [
-    `${district} Municipal Corporation (Mahanagar Palika / Nagar Nigam)`,
-    `${district} Nagar Palika Parishad (City Council)`,
-    `${district} Zilla Parishad & Block Development Office`,
-    `Ward Office / Gram Sabha (${district})`
-  ];
+  // 3. Ensure Peri-urban Town Panchayat is available
+  if (!hasPanchayat) {
+    bodies.push(`[Town Panchayat] ${cleanDistrict} Nagar Panchayat / Town Board`);
+  }
+  for (const b of formattedMapped.filter((b) => b.startsWith('[Town Panchayat]'))) {
+    if (!bodies.includes(b)) bodies.push(b);
+  }
+
+  // 4. Ensure Rural Zilla Parishad & Block Samiti is available
+  if (!hasRural) {
+    bodies.push(`[Rural / Zilla Parishad] ${cleanDistrict} Zilla Parishad & Block Development Samiti`);
+  }
+  for (const b of formattedMapped.filter((b) => b.startsWith('[Rural / Zilla Parishad]'))) {
+    if (!bodies.includes(b)) bodies.push(b);
+  }
+
+  // 5. Add other mapped special bodies (Cantonment, Development Authorities)
+  for (const b of formattedMapped) {
+    if (!bodies.includes(b) && bodies.length < 8) {
+      bodies.push(b);
+    }
+  }
+
+  return bodies;
 }

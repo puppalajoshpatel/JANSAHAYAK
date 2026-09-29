@@ -8,13 +8,17 @@ export interface AIAnalysisResult {
   detectedLanguage?: string;
   translatedEnglishSummary?: string;
   demandTier: DemandTier;
-  estimatedAffectedPer100: number; // e.g. 38 (out of 100)
+  civicDemandGravityScore?: number; // CDGI (0-100)
+  civicPriorityIndex: number; // Civic Priority Gravity Index (0-100)
+  verifiedCitizenEstimate?: number; // Estimated verified co-signers
+  communityReachEstimate?: string; // e.g. "Estimated 850+ local residents impacted"
   urgencyScore: number; // 1-100
   recommendedDepartment: string;
   applicableGovScheme: string;
   estimatedBudgetRange: string;
   keyActionPoints: string[];
   slaDaysRecommended: number;
+  estimatedAffectedPer100?: number; // legacy backward compatibility
 }
 
 export async function analyzeCitizenGrievance(
@@ -207,6 +211,7 @@ function localCivicNlpParser(
   // Determine title
   const words = rawText.trim().split(/\s+/).slice(0, 10).join(' ');
   const title = words.length > 5 ? `${words}...` : `${subCategory} Grievance in ${location.wardOrPanchayat || 'Locality'}`;
+  const cpiScore = Math.min(98, Math.max(25, Math.round(urgency * 0.92 + (affectedPer100 * 0.2))));
 
   return {
     category,
@@ -217,6 +222,8 @@ function localCivicNlpParser(
     translatedEnglishSummary: rawText,
     demandTier,
     estimatedAffectedPer100: affectedPer100,
+    civicPriorityIndex: cpiScore,
+    communityReachEstimate: `Estimated ${Math.round(cpiScore * 18)}+ local residents directly impacted`,
     urgencyScore: urgency,
     recommendedDepartment: department,
     applicableGovScheme: scheme,

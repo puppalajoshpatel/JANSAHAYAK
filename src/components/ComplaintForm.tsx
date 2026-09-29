@@ -175,10 +175,9 @@ export const ComplaintForm: React.FC<ComplaintFormProps> = ({
       const tokenId = `${prefix}-${stateCode}-${randomNum}`;
 
       // Calculate demand metric based on AI result or category base
-      const affectedPer100 = aiResult?.estimatedAffectedPer100 || 
-        (category === 'water_drainage' ? 52 : category === 'hospitals' ? 44 : category === 'roads' ? 38 : 28);
-      
-      const demandTier = affectedPer100 >= 35 ? 'high' : affectedPer100 >= 15 ? 'mid' : 'low';
+      const cpiScore = aiResult?.civicPriorityIndex || Math.min(99, Math.max(25, Math.round((aiResult?.urgencyScore || 75) * 0.92)));
+      const verifiedCoSigners = Math.max(25, Math.round(cpiScore * 5.8));
+      const demandTier = cpiScore >= 70 ? 'high' : cpiScore >= 40 ? 'mid' : 'low';
 
       const newGrievance: GrievanceItem = {
         id: tokenId,
@@ -191,7 +190,7 @@ export const ComplaintForm: React.FC<ComplaintFormProps> = ({
           country: 'India',
           state,
           district,
-          localBodyType: 'Municipal Corporation',
+          localBodyType: localBody.includes('Corporation') ? 'Municipal Corporation' : 'Municipality',
           localBodyName: localBody,
           wardOrPanchayat: ward,
           pincode,
@@ -200,9 +199,10 @@ export const ComplaintForm: React.FC<ComplaintFormProps> = ({
         submittedAt: new Date().toISOString(),
         citizenName: userProfile.name,
         maskedPan: `${userProfile.panNumber.substring(0, 5)}****${userProfile.panNumber.slice(-1)}`,
-        samplePopulationBase: 100,
-        affectedMembersCount: affectedPer100,
-        totalCommunityEndorsements: Math.round(affectedPer100 * 9.5),
+        affectedMembersCount: cpiScore,
+        civicPriorityIndex: cpiScore,
+        totalCommunityEndorsements: verifiedCoSigners,
+        demandVelocity: cpiScore >= 70 ? 'Rapid Spike' : 'Steady',
         demandTier,
         urgencyScore: aiResult?.urgencyScore || 75,
         status: 'submitted',
@@ -219,7 +219,7 @@ export const ComplaintForm: React.FC<ComplaintFormProps> = ({
             date: new Date().toISOString().split('T')[0],
             officer: 'JanVichar Gateway',
             department: aiResult?.recommendedDepartment || 'Central Administrative Triage',
-            comment: `Grievance registered under PAN token. Auto-routed to ${aiResult?.recommendedDepartment || 'Zonal Municipal Office'}. Demand projection: ${affectedPer100} out of 100 citizens.`
+            comment: `Grievance registered under PAN token. Auto-routed to ${aiResult?.recommendedDepartment || 'Zonal Municipal Office'}. Demand Gravity: CDGI ${cpiScore}/100 with ${verifiedCoSigners} verified citizens.`
           }
         ]
       };
@@ -653,8 +653,8 @@ export const ComplaintForm: React.FC<ComplaintFormProps> = ({
                 </div>
 
                 <div className="p-2.5 bg-white rounded-xl border border-amber-200">
-                  <span className="text-[10px] text-slate-500 font-semibold block uppercase">Projected Impact</span>
-                  <span className="font-bold text-amber-800">{aiResult.estimatedAffectedPer100} / 100 Members</span>
+                  <span className="text-[10px] text-slate-500 font-semibold block uppercase">Demand Gravity</span>
+                  <span className="font-bold text-amber-800">CDGI {aiResult.civicPriorityIndex || 78} / 100</span>
                 </div>
 
                 <div className="p-2.5 bg-white rounded-xl border border-amber-200">

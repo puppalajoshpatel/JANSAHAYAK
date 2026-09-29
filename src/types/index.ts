@@ -70,10 +70,12 @@ export interface GrievanceItem {
   citizenName: string;
   maskedPan: string; // e.g. "ABCDE****F"
   
-  // Government Data & Demand Aggregation (out of 100 members)
-  samplePopulationBase: number; // default 100
-  affectedMembersCount: number; // e.g. 38 (out of 100 members)
-  totalCommunityEndorsements: number; // e.g. 420 citizens
+  // Government Demand Aggregation & Scientific Gravity Index
+  samplePopulationBase?: number; // legacy backward compatibility
+  affectedMembersCount: number; // mapped to Civic Priority Score (0-100)
+  civicPriorityIndex?: number; // Civic Priority Gravity Index (CPI: 1-100)
+  totalCommunityEndorsements: number; // e.g. 524 verified citizens
+  demandVelocity?: 'Rapid Spike' | 'Steady' | 'Normal';
   demandTier: DemandTier; // high, mid, low
   urgencyScore: number; // 1-100
   
@@ -116,7 +118,8 @@ export interface DemandAggregateStat {
   iconName: string;
   totalComplaints: number;
   resolvedComplaints: number;
-  avgAffectedPer100: number; // e.g. 32 out of 100
+  avgDemandGravity: number; // e.g. 78 out of 100 Civic Demand Gravity Index
+  avgAffectedPer100?: number; // legacy backward compatibility
   demandTier: DemandTier;
   totalBudgetAllocatedLakhs: number;
   activeProjects: number;

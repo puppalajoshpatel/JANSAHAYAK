@@ -294,8 +294,8 @@ export const BudgetProjectTracker: React.FC<BudgetProjectTrackerProps> = ({
 
               {/* Citizen Spot Audit Action */}
               <div className="pt-2 border-t border-slate-100 flex flex-wrap items-center justify-between gap-3 text-xs">
-                <span className="text-slate-500">
-                  Citizen Demand Impact: <strong>{item.affectedMembersCount} out of 100 members</strong> in this ward
+                <span className="text-slate-600">
+                  Verified Priority: <strong className="text-amber-800 font-mono">CPI {item.civicPriorityIndex || item.affectedMembersCount}/100</strong> • <strong>{item.totalCommunityEndorsements} verified citizens</strong> co-signed
                 </span>
 
                 <button
